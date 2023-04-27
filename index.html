@@ -1,0 +1,340 @@
+<html>
+<head>
+
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-8NT7FHWHBH"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-8NT7FHWHBH');
+	</script>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<title>MapLah!</title>
+	
+	<meta property="og:title" content="MapLah!" />
+	<meta property="og:url" content="https://maplah.github.io/map/" />
+	<meta property="og:description" content="Wondering where to enjoy the DBS 5 Million Hawker Meals?" />
+	<meta property="og:image" content="https://raw.githubusercontent.com/jytg17/maplah/main/preview.jpg" />
+	
+	<!-- Leaflet -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+
+	
+	<!-- Load jQuery and PapaParse -->
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+	 
+	<!-- MarkerCluster -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.5.0/dist/MarkerCluster.css"
+      integrity="sha384-pmjIAcz2bAn0xukfxADbZIb3t8oRT9Sv0rvO+BR5Csr6Dhqq+nZs59P0pPKQJkEV"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.5.0/dist/MarkerCluster.Default.css"
+      integrity="sha384-wgw+aLYNQ7dlhK47ZPK7FRACiq7ROZwgFNg0m04avm4CaXS+Z9Y7nMu8yNjBKYC+"
+      crossorigin="anonymous"
+    />
+
+    <script
+      src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js"
+      integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+      integrity="sha384-RFZC58YeKApoNsIbBxf4z6JJXmh+geBSgkCQXFyh+4tiFSJmJBt+2FbjxW7Ar16M"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/leaflet.markercluster@1.5.0/dist/leaflet.markercluster.js"
+      integrity="sha384-89yDmbSkL9reFc77m10ZbqLaUMf1sp7FAJs2oAD/rczNnY7I+17yN9KML6tpYpCk"
+      crossorigin="anonymous"
+    ></script>
+	
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+			
+		}
+		.leaflet-container {
+			height: 100%;
+			width: 100%;
+			max-width: 100%;
+			max-height: 100%;
+			
+		}
+		
+		#map { 
+			height: 100%; width: 100%; 
+		}
+		
+		#searchID input {
+			width: 350px;
+            height: 20px;
+            margin: 0;
+            padding: 15px;
+            background: #fff;
+            border: 1px solid black;
+            color: #727272;
+            float: right;
+            font: 12px "Lucida Sans Unicode", sans-serif;
+            transition: background 0.4s ease-in-out 0s;
+			z-index:999;
+        }
+
+        #searchID button {
+            width: 45px;
+            height: 45px;
+            text-indent: -9999em;
+            background:  #4eac10;
+            transition: background 0.3s ease-in-out 0s;
+            border: 1px solid #fff;
+        }
+
+        #containerID {
+			position:fixed;
+			top:5%;
+			right: 8%;
+			height:1%;
+			width:2%;
+			z-index:999;
+        }
+		
+		#ui-id-1 {
+		z-index:999;
+		font: 12px "Lucida Sans Unicode", sans-serif;
+        }
+		
+	.popup{
+		background-color: #1E3B5A;
+		color: #ffffff;
+		width: 30%;
+		padding: 30px 40px;
+		position: absolute;
+		transform: translate(-50%,-50%);
+		left: 50%;
+		top: 50%;
+		border-radius: 8px;
+		display: none;
+		font-family: “Poppins”,sans-serif;
+		text-align: center;
+		z-index: 999;
+		max-height: 70%;
+		max-width: 60%;
+		overflow: auto;
+		}
+		
+	.popup button{
+		display: block;
+		margin:  0 0 20px auto;
+		background-color: transparent;
+		font-size: 30px;
+		color: #ffffff;
+		border-radius: 100%;
+		width: 40px;
+		height: 40px;
+		border: none;
+		outline: none;
+		cursor: pointer;
+	}
+	
+	.popup h1{
+	   margin-top: -20px;
+	}
+	
+	.popup p{
+		font-size: 14px;
+		text-align: justify;
+		margin: 20px 0;
+
+	}
+
+
+	
+	#letsgo {
+		display: block;
+		width: 60%;
+		position: relative;
+		margin: 10px auto;
+		text-align: center;
+		background-color: #FFD700;
+		border-radius: 20px;
+		color: #ffffff;
+		text-decoration: none;
+		font-size: 16px;
+	}
+
+	#popup1 {
+	  -webkit-box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
+	  box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
+	}
+		
+	
+	</style>
+	
+	<!-- Geocoder -->
+	<script src=
+	"https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js">
+    </script>
+    <link rel="stylesheet" href="
+	https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css" />
+    <script src="
+	https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js">
+    </script>
+
+</head>
+<body onload ="show('popup1')">
+
+<div id='map'></div>
+<div id='containerID'>
+	<form method="get" id="searchID">
+    <input type="text" class="searchClass"
+        id="searchInputID" placeholder="Search Address" />
+    </form>
+</div>
+
+<div class="popup" id="popup1">
+	<button style="color: #ffffff;" id=”close” onclick="hide('popup1')">&times;</button>
+	<h1>MapLah!</h1>
+	<p><i><b>MapLah!</b> is a ground-up effort to map the locations of <a style="color: #BF40BF;" href="https://www.dbs.com.sg/iwov-resources/media/pdf/deposits/dbs-paylah-hawker-list.pdf"> participating hawkers</a> under the <a style="color: #BF40BF;" href="https://www.dbs.com.sg/personal/deposits/pay-with-ease/paylah-5-million-hawker-meals?cid=sg-dbs-pweb-deposits-pt-support-hawkers-btnfindoutmore-paylah-5-million-hawker-meals#">DBS 5 Million Hawker Meals</a>, where PayLah! users enjoy $3 subsidies on their meals every Friday (till 19 Jan 2024). Links above provide additional details on the initiative by DBS.<br>
+	<br> Driven by a personal preference to geolocate these stalls and view them on-the-go, MapLah! became a weekend project done amidst the family-work juggling act. It is my aspiration that MapLah! encourages you to hop on the bandwagon and snap up good foodie deals around the corner! 
+	<br><br>(This site is in beta phase and technical bugs may be experienced)
+	
+	<br><br> - Josh </i></p>
+
+	<button style="color: #000000;" id="letsgo" onclick="hide('popup1')"><b>Let’s Go!</b></button>
+</div>
+
+
+<script>
+
+	// Create map
+	const map = L.map('map',{maxBounds: [[1.2750,103.5417],[1.3333,104.1785],[1.4850,103.8142], [1.1733,103.8355]], maxBoundsViscosity: 0.6}).setView([1.3632,103.8136], 12);
+
+	const tiles = L.tileLayer('https://maps-{s}.onemap.sg/v3/Grey/{z}/{x}/{y}.png', {
+            detectRetina: true,
+            maxZoom: 19,
+            minZoom: 12,
+			opacity:0.9,
+			attribution: '<img src="https://docs.onemap.sg/maps/images/oneMap64-01.png" style="height:20px;width:20px;"/> New OneMap | Map data &copy; contributors, <a href="http://SLA.gov.sg">Singapore Land Authority</a>'
+          }).addTo(map);
+
+	// Custom popup
+	var popup = L.popup({
+        'maxHeight': '100'
+        });
+		
+	// Custom icon
+	var foodicon = L.icon({
+	iconUrl: 'https://raw.githubusercontent.com/jytg17/maplah/main/reshot-icon-hard-hat-LEWQ9X8VAM.svg',
+	iconSize:     [38, 95]});		
+	
+	var searchicon = L.icon({
+	iconUrl: 'https://raw.githubusercontent.com/jytg17/maplah/main/star-origami-paper-svgrepo-com.svg',
+	iconSize:     [50, 50]});	
+		
+	//var marker = L.marker([1.3605, 103.8198]).addTo(map);
+	$.get('https://raw.githubusercontent.com/jytg17/maplah/main/dbs_geolocated.csv', function(csvString) {
+
+		// Use PapaParse to convert string to array of objects
+		var data = Papa.parse(csvString, {header: true, dynamicTyping: true}).data;
+	
+		var markers = data;
+		var markerClusters = L.markerClusterGroup();
+		
+		for (var i = 0; i < markers.length-1; ++i)
+		{var stall_list = markers[i].stalls.split(",");
+		//console.log(stall_list);
+		let txt = "";
+		
+		stall_list.forEach(myFunction);
+
+		function myFunction(value) {
+			value = value.replace(/[^\w\s\#\-]|_/g, "")
+					.replace(/\s+/g, " ");
+			//console.log(value);
+			txt += "<li>" + value + "</li>";
+		}		
+		
+		var m = L.marker([markers[i].lat, markers[i].lon], {icon:foodicon}).bindPopup("<b>" + markers[i].name + "</b>"+ "<br><br>" + "<b>" + markers[i].address + "</b>"+ "<br><br><u>" + "PARTICIPATING STALLS </u><br/ul>"+txt+"</ul>",{maxHeight:180});
+		//console.log(m)
+		markerClusters.addLayer( m );
+		};
+		
+		map.addLayer(markerClusters);
+		});
+	
+	
+	//Create address autocomplete [https://stackoverflow.com/questions/72123840/onemap-search-api-autocomplete-suggestions-are-not-showing]	
+	$(".searchClass").autocomplete({
+    source: function (request, response) {
+    var oneMapURL = "https://developers.onemap.sg/commonapi/search?returnGeom=Y&getAddrDetails=Y&searchVal=%QUERY";
+    URL = oneMapURL.replace('%QUERY', request.term);
+        
+     // JSON Request
+     $.ajax({
+         url: URL,
+         dataType: "json",
+         data: {
+        // Output format
+         format: "json",
+         search: request.term,
+         namespace: 0,
+         },
+      })
+         .success(function(data) {
+             var sgAreas = data.results;
+			 window.address = data.results;
+             var searchValues = sgAreas.map(function(sgArea) {
+             return sgArea['SEARCHVAL'];
+             });
+             response(searchValues);
+			 //console.log(address[0]["SEARCHVAL"]);
+             });
+         },
+    });
+
+	// Create address locator 
+	const layerGroup = L.layerGroup();	// init the empty layerGroup
+	
+	var click = document.getElementById("ui-id-1");
+	var input = document.getElementById("searchInputID");
+	
+	click.addEventListener("click", function(event) {
+		for (var num = 0; num < address.length; ++num){
+			if(input.value == address[num]["SEARCHVAL"]){
+			//console.log(address[num]["LATITUDE"] + address[num]["LONGITUDE"]);
+			 
+			layerGroup.clearLayers();
+			var searchMarker = L.marker([address[num]["LATITUDE"], address[num]["LONGITUDE"]],{icon:searchicon}).addTo(layerGroup);
+			map.setView([address[num]["LATITUDE"], address[num]["LONGITUDE"]], 17); 
+			//console.log(e.geocode.center.lat)
+			map.addLayer(layerGroup);
+			}
+		}
+	});
+	
+	// popup msg
+	A = function(id) {
+	  return document.getElementById(id);
+	}
+	var show = function(id) {
+		A(id).style.display ='block';
+	}
+	var hide = function(id) {
+		A(id).style.display ='none';
+	}
+	
+
+</script>
+
+</body>
+</html>
